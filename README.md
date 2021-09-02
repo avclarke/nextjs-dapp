@@ -1,8 +1,34 @@
+# Yield Farming Dapp (Web3 playground)
+
+Non production code Dapp play ground for exploring solidity and web3 frontend architecture.
+
+# Contracts
+
+## Local dev (Ganache)
+
+### Install Truffle
+
+`npm install -g truffle`
+
+### Run Ganace
+
+[Install](https://www.trufflesuite.com/ganache) and start Ganache
+
+### Deploy Contracts
+
+`truffle compile`
+
+`truffle migrate`
+
+# Dapp (Nextjs)
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
 
 First, run the development server:
+
+`npm install`
 
 ```bash
 npm run dev
