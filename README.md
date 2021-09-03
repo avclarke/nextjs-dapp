@@ -1,6 +1,6 @@
-# Yield Farming Dapp (Web3 playground)
+# Next JS Dapp (Web3 playground)
 
-Play ground for experimenting with Solidity and Web3 Frontend architectures.
+Play ground for experimenting with Solidity and Web3 Frontend architectures, based on a yield farming style protocol.
 
 # Contracts
 

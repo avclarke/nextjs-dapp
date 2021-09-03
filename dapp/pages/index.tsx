@@ -1,38 +1,37 @@
-import { useEffect, useState } from "react";
-import { useWeb3React } from "@web3-react/core";
+import { useEffect, useState } from 'react'
+import { useWeb3React } from '@web3-react/core'
 
-import Head from "next/head";
+import Head from 'next/head'
 
-import styles from "../styles/Home.module.css";
-import ConnectWallet from "../components/ConnectWallet";
-import { injected } from "../injected";
+import styles from '../styles/Home.module.css'
+import ConnectWallet from '../components/ConnectWallet'
+import { injected } from '../injected'
 
 export default function Home() {
-  const { account, library, activate, active, deactivate } = useWeb3React();
+  const { account, activate, active } = useWeb3React()
 
-  const [attempted, setAttempted] = useState(false);
-  const [connected, setConnected] = useState(!!account);
+  const [attempted, setAttempted] = useState(false)
 
-  const isConnected = !!account;
+  const isConnected = !!account
 
   useEffect(() => {
     injected.isAuthorized().then((isAuthorized) => {
-      console.log("is authed", isAuthorized);
+      console.log('is authed', isAuthorized)
       if (isAuthorized) {
         activate(injected, undefined, true).catch(() => {
-          setAttempted(true);
-        });
+          setAttempted(true)
+        })
       } else {
-        setAttempted(true);
+        setAttempted(true)
       }
-    });
-  }, [activate]);
+    })
+  }, [activate])
 
   useEffect(() => {
     if (!attempted && active) {
-      setAttempted(true);
+      setAttempted(true)
     }
-  }, [attempted, active]);
+  }, [attempted, active])
 
   return (
     <div className={styles.container}>
@@ -45,11 +44,11 @@ export default function Home() {
       <main className={styles.main}>
         <h1 className={styles.title}>Next JS Dapp</h1>
         {isConnected ? (
-          "Connected: " + account
+          'Connected: ' + account
         ) : (
           <ConnectWallet attempted={attempted} />
         )}
       </main>
     </div>
-  );
+  )
 }
