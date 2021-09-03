@@ -1,6 +1,6 @@
 # Yield Farming Dapp (Web3 playground)
 
-Non production code Dapp play ground for exploring solidity and web3 frontend architecture.
+Play ground for experimenting with Solidity and Web3 Frontend architectures.
 
 # Contracts
 
@@ -28,12 +28,12 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 First, run the development server:
 
-`npm install`
+```bash
+npm install
+```
 
 ```bash
 npm run dev
-# or
-yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
