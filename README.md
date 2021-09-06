@@ -14,7 +14,14 @@ Play ground for experimenting with Solidity and Web3 Frontend architectures, bas
 
 [Install](https://www.trufflesuite.com/ganache) and start Ganache
 
-### Deploy Contracts
+### Deploy Contracts (Ganache and Ropsten)
+
+Create a .env file and add:
+
+```
+MNENOMIC=<Your mnemonic>
+INFURA_API_KEY=<Your infura api key>
+```
 
 `truffle compile`
 
