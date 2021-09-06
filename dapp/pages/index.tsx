@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useWeb3React } from '@web3-react/core'
 import Head from 'next/head'
 
@@ -9,21 +9,35 @@ import { injected } from '../injected'
 
 function HomeContent() {
   const { account, activate, active } = useWeb3React()
+  const chainListener = useRef(null)
 
   const [attempted, setAttempted] = useState(false)
   const [unsupportedChain, setUnsupportedChain] = useState(false)
 
   const isConnected = !!account
 
+  const checkNetworkSupport = () => {
+    const { supportedChainIds } = injected
+
+    const { chainId = 1 } = window.ethereum || {}
+
+    const parsedChainId = parseInt(chainId, 16)
+    const supportedChain = supportedChainIds.includes(parsedChainId)
+    setUnsupportedChain(!supportedChain)
+    return !!supportedChain
+  }
+
   useEffect(() => {
+    // TODO: Move wallet related logic to page wrapper
     injected.isAuthorized().then((isAuthorized) => {
-      const { supportedChainIds } = injected
+      const supportedChain = checkNetworkSupport()
 
-      const { chainId = 1 } = window.ethereum || {}
-
-      const parsedChainId = parseInt(chainId, 16)
-      const supportedChain = supportedChainIds.includes(parsedChainId)
-      setUnsupportedChain(!supportedChain)
+      if (!chainListener.current) {
+        chainListener.current = window.ethereum.on(
+          'chainChanged',
+          checkNetworkSupport,
+        )
+      }
 
       if (isAuthorized && supportedChain) {
         activate(injected, undefined, true).catch(() => {
@@ -33,7 +47,7 @@ function HomeContent() {
         setAttempted(true)
       }
     })
-  }, [activate, window.ethereum?.chainId])
+  }, [activate])
 
   useEffect(() => {
     if (!attempted && active) {
