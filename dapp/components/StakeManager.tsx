@@ -4,25 +4,40 @@ import { Contract } from '@ethersproject/contracts'
 import { formatEther, formatUnits, parseEther } from '@ethersproject/units'
 
 import YieldTokenAbi from '../../build/contracts/YieldToken.json'
+import TestTokenAbi from '../../build/contracts/TestToken.json'
 import Button from './Button'
 import Tabs from './Tabs'
 
 export default function StakeManager() {
   const { library, account, chainId } = useWeb3React()
-  const [type, setType] = useState<'deposit' | 'withdraw'>('deposit')
-  const [balance, setBalance] = useState<string | undefined>()
+  const [state, setState] = useState({
+    balance: '0',
+    stake: '0',
+    allowance: '0',
+  })
   const [selectedTab, setSelectedTab] = useState<string>('Deposit')
   const [value, setValue] = useState<string>('')
 
-  const address = YieldTokenAbi.networks[chainId].address
+  const yieldAddress = YieldTokenAbi.networks[chainId].address
+  const tokenAddress = TestTokenAbi.networks[chainId].address
 
-  const contract = useMemo(() => {
-    return new Contract(address, YieldTokenAbi.abi, library.getSigner(account))
-  }, [account, address])
+  const [yieldContract, tokenContract] = useMemo(() => {
+    return [
+      new Contract(yieldAddress, YieldTokenAbi.abi, library.getSigner(account)),
+      new Contract(tokenAddress, TestTokenAbi.abi, library.getSigner(account)),
+    ]
+  }, [account, yieldAddress, tokenAddress])
 
   const fetchBalance = async () => {
-    const bal = await contract.balanceOf(account)
-    setBalance(formatEther(bal))
+    const stakeBal = await yieldContract.balanceOf(account)
+    const tokenBal = await tokenContract.balanceOf(account)
+    const allowance = await tokenContract.allowance(account, yieldAddress)
+
+    setState({
+      balance: formatEther(tokenBal),
+      stake: formatEther(stakeBal),
+      allowance: formatEther(allowance),
+    })
   }
 
   useEffect(() => {
@@ -31,8 +46,20 @@ export default function StakeManager() {
 
   const deposit = async () => {
     try {
+      // TODO: Display activity
       const weiValue = parseEther(value)
-      await contract.deposit(weiValue)
+      await yieldContract.deposit(weiValue)
+    } catch (err) {
+      // TODO: Display error
+      console.warn(err)
+    }
+  }
+
+  const approve = async () => {
+    try {
+      const weiValue = parseEther(value)
+      await tokenContract.approve(yieldAddress, weiValue)
+      fetchBalance()
     } catch (err) {
       // TODO: Display error
       console.warn(err)
@@ -53,7 +80,9 @@ export default function StakeManager() {
   return (
     <div className="w-96">
       <div className="py-4 text-center rounded bg-gray-100">
-        Active stake: {balance}
+        Token balance: {state.balance}
+        <br />
+        Active stake: {state.stake}
       </div>
       <div className="my-2">
         <Tabs
@@ -68,7 +97,11 @@ export default function StakeManager() {
         placeholder="0.00"
       />
       {selectedTab === 'Deposit' ? (
-        <Button onClick={deposit}>Deposit</Button>
+        Number(state.allowance) >= Number(value) ? (
+          <Button onClick={deposit}>Deposit</Button>
+        ) : (
+          <Button onClick={approve}>Approve</Button>
+        )
       ) : (
         <Button onClick={withdraw}>Withdraw</Button>
       )}
